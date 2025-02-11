@@ -10,18 +10,19 @@ namespace Messenger.Data
         {
             _connectionString = connectionString;
         }
-        public async Task CreateTable() 
+
+        public async Task CreateMessagesTableAsync() 
         {
             using(var connection = new NpgsqlConnection(_connectionString)) 
             {
                 await connection.OpenAsync();
-                var createTableQuery = 
-                    @"CREATE TABLE IF NOT EXISTS Messages(
+                var createTableQuery =
+                    @"CREATE TABLE IF NOT EXISTS messages (
                         id SERIAL PRIMARY KEY,
-                        messageContent VARCHAR(128) NOT NULL, 
-                        timeStamp TIMESTAMP DEFAULT TIMESTAMP CURRENT_TIMESTAMP,
-                        order INT NOT NULL
-        `           )";
+                        message_content VARCHAR(128) NOT NULL, 
+                        time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        sequence_number INT NOT NULL
+                   )";
                 await connection.ExecuteAsync(createTableQuery);
                 Console.WriteLine("Таблица создана");
             }

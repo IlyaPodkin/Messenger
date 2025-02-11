@@ -1,14 +1,27 @@
+using Messenger.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMvc();
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsetings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
-var connectionString = configuration.GetConnectionString("DefaultConction");
+var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddScoped<MessageRepository>(provider =>
+    new MessageRepository(connectionString));
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+app.MapControllers();
+
+var dbContext = new ApplicationContext(connectionString);
+await dbContext.CreateMessagesTableAsync();
 
 app.Run();
