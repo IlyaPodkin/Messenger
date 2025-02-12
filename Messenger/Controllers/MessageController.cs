@@ -9,9 +9,9 @@ namespace Messenger.Controllers
     public class MessageController : BaseController
     {
         private readonly MessageRepository _messageRepository;
-        private readonly MessageHub _messageHub;
+        private readonly IHubContext<MessageHub> _messageHub;
 
-        public MessageController(MessageRepository messageRepository, MessageHub messageHub) 
+        public MessageController(MessageRepository messageRepository, IHubContext<MessageHub> messageHub) 
         {
             _messageRepository = messageRepository;
             _messageHub = messageHub;
@@ -25,7 +25,7 @@ namespace Messenger.Controllers
                 return BadRequest("Сообщение не должно быть пустым и должно содержать максимум 128 символов");
             }
             await _messageRepository.CreateMessage(request.Content, request.SequenceNumber);
-            await _messageHub.Clients.All.SendAsync("ReseiveMessage", "Server", request.Content);
+            await _messageHub.Clients.All.SendAsync("ReceiveMessage", "Server", request.Content);
 
             return Ok("Сообщение отправлено");
         }
