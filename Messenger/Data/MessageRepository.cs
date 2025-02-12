@@ -12,19 +12,7 @@ namespace Messenger.Data
         {
             _connectionString = connectionString;
         }
-
-        public async Task<IEnumerable<Message>> GetMessagesAsync(DateTime from, DateTime to) 
-        {
-            using (var connection = new NpgsqlConnection(_connectionString)) 
-            {
-                await connection.OpenAsync();
-                var query = @"SELECT id AS Id, message_content AS Text, time_stamp AS TimeStamp, sequence_number AS Order 
-                              FROM messages
-                              WHERE time_stamp BETWEEN @From AND @To
-                              ORDER BY time_stamp ASC";
-                return await connection.QueryAsync<Message>(query, new {From = from, To = to });
-            }
-        }        
+     
         public async Task<IEnumerable<Message>> GetAllMessagesAsync() 
         {
             using (var connection = new NpgsqlConnection(_connectionString)) 
