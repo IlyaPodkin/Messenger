@@ -18,19 +18,24 @@ namespace Messenger.Data
             using (var connection = new NpgsqlConnection(_connectionString)) 
             {
                 await connection.OpenAsync();
-                var query = @"SELECT id AS Id, message_content AS Text, time_stamp AS TimeStamp, sequence_number AS Order 
+                var query = @"SELECT id AS Id, user_name AS UserName, message_content AS Text, time_stamp AS TimeStamp
                               FROM messages";
                 return await connection.QueryAsync<Message>(query);
             }
         }
 
-        public async Task CreateMessage(string content, int sequenceNumber) 
+        public async Task<Message> CreateMessage(string userName, string content)
         {
-            using (var connection = new NpgsqlConnection(_connectionString)) 
+            using (var connection = new NpgsqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var query = @"INSERT INTO messages (message_content, sequence_number) VALUES (@MessageContent, @SequenceNumber)";
-                await connection.QueryAsync<Message>(query, new { MessageContent = content, SequenceNumber = sequenceNumber });
+                var timeStamp = DateTime.Now;
+                var query = @"INSERT INTO messages (user_name, message_content, time_stamp) 
+                      VALUES (@UserName, @MessageContent, CURRENT_TIMESTAMP)
+                      RETURNING id, user_name AS UserName, message_content AS Text, time_stamp AS TimeStamp";
+
+                var newMessage = await connection.QuerySingleAsync<Message>(query, new { UserName = userName, MessageContent = content, TimeStamp = timeStamp });
+                return newMessage;
             }
         }
     }

@@ -24,10 +24,12 @@ namespace Messenger.Controllers
             {
                 return BadRequest("Сообщение не должно быть пустым и должно содержать максимум 128 символов");
             }
-            await _messageRepository.CreateMessage(request.Content, request.SequenceNumber);
-            await _messageHub.Clients.All.SendAsync("ReceiveMessage", "Server", request.Content);
-
-            return Ok("Сообщение отправлено");
+            var newMessage = await _messageRepository.CreateMessage(request.UserName, request.Content);
+            await _messageHub.Clients.All.SendAsync("ReceiveMessage", request.UserName, request.Content, newMessage.TimeStamp);
+            return Ok(new {userName = request.UserName,
+                           content  = request.Content,
+                           timeStamp = newMessage.TimeStamp 
+            });
         }
 
         [HttpGet("message")]
