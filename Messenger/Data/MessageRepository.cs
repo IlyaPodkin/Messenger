@@ -24,6 +24,19 @@ namespace Messenger.Data
             }
         }
 
+        public async Task<IEnumerable<Message>> GetMessagesByDateRange(DateTime from, DateTime to)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var query = @"SELECT id AS Id, user_name AS UserName, message_content AS Text, time_stamp AS TimeStamp
+                              FROM messages
+                              WHERE time_stamp BETWEEN @From AND @To
+                              ORDER BY time_stamp ASC";
+                return await connection.QueryAsync<Message>(query, new { From = from, To = to });
+            }
+        }
+
         public async Task<Message> CreateMessage(string userName, string content)
         {
             using (var connection = new NpgsqlConnection(_connectionString))

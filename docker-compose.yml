@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres-db-messenger
+    environment: 
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: Messenger123
+        POSTGRES_DB: MessengerApp
+    ports:
+        - "5432:5432"
+    volumes:
+        - postgres_data:/var/lib/postgresql/data
+    networks:
+        - app-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+      target: production-backend  
+    ports:
+      - "5218:5218" 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+      target: production-frontend  
+    ports:
+      - "3000:80"  
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

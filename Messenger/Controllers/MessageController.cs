@@ -32,6 +32,17 @@ namespace Messenger.Controllers
             });
         }
 
+        [HttpGet("message/date")]
+        public async Task<IActionResult> GetMessagesByTimeRange([FromQuery]DateTime from, [FromQuery]DateTime to)
+        {
+            if (from > to)
+            {
+                return BadRequest("Дата начала не может быть больше даты окончания.");
+            }
+            var messages = await _messageRepository.GetMessagesByDateRange(from, to);
+            return Ok(messages);
+        }
+
         [HttpGet("message")]
         public async Task<IActionResult> GetMessages() => Ok(await _messageRepository.GetAllMessagesAsync());
     }

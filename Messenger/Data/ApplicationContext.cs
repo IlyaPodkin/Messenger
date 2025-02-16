@@ -21,7 +21,7 @@ namespace Messenger.Data
                         id SERIAL PRIMARY KEY,
                         user_name VARCHAR(128) NOT NULL,
                         message_content VARCHAR(128) NOT NULL, 
-                        time_stamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP                   
+                        time_stamp TIMESTAMP WITH TIME ZONE                   
                     )";
                 await connection.ExecuteAsync(createTableQuery);
                 Console.WriteLine("Таблица создана");
